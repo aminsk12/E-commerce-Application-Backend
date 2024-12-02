@@ -1,7 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from "express"
 import cors from 'cors'
-//import router from "./app/routes";
-//import globalErrorHandler from "./app/middlewares/globalErrorHandaler";
+import router from "./app/routes";
+import globalErrorHandler from "./app/middlewares/globalErrorHandaler";
 
 const app: Application = express();
 
@@ -18,10 +18,10 @@ app.get('/', (req: Request, res: Response) => {
     })
 })
 
-//app.use('/api/v1', router);
+app.use('/api/v1', router);
 
 
-//app.use(globalErrorHandler)
+app.use(globalErrorHandler)
 
 app.use(( req: Request, res: Response, next: NextFunction) => {
     res.status(404).json({

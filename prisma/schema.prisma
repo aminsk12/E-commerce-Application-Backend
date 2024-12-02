@@ -46,8 +46,8 @@ model Admin {
 enum UserRole {
   SUPER_ADMIN
   ADMIN
-  DOCTER
-  PATIENT
+  VENDOR
+  CASTOMER
 }
 
 enum UserStatus {
