@@ -1,11 +1,8 @@
-import { z } from "zod"
+import { z } from "zod";
 
-const adminUpdateValidate = z.object({
-    body: z.object({
-        name: z.string().optional(),
-        contactNumber: z.string().optional()
-    })
-})
-export const adminValidateSchemas ={
-    adminUpdateValidate
-}
+export const update = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    contactNumber: z.string().optional(),
+  }),
+});
