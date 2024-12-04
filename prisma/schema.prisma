@@ -1,53 +1,49 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") 
 }
 
-model User {
-  id                 String     @id @default(uuid())
-  email              String     @unique
-  password           String
-  vendor             Vendor?
-  admin              Admin?
-  customer           Customer?
-  status             UserStatus @default(ACTIVE)
+model User{
+  id          String   @id @default(uuid())
+  email       String @unique
+  password    String
+  vendor      Vendor?
+  admin       Admin?
+  customer    Customer?
+  status      UserStatus @default(ACTIVE)
   needPasswordChange Boolean    @default(true)
-  role               UserRole
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-
+  role        UserRole
+  isDeleted   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   @@map("users")
 }
 
 model Customer {
-  id            String       @id @default(uuid())
-  name          String
-  email         String       @unique
-  password      String
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
   profilePhoto  String?
   contactNumber String?
-  orders        Order[]
-  reviews       Review[]
-  cart          Cart[]
-  userId        String       @unique
-  user          User         @relation(fields: [userId], references: [id])
-  followedShops Shop[]       @relation("UserFollowedShops")
-  recentView    RecentView[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-
+  orders      Order[]
+  reviews     Review[]
+  cart        Cart[]
+  user        User     @relation(fields: [email], references: [email])
+  followedShops Shop[] @relation("UserFollowedShops")
+  recentView  RecentView[]
+  isDeleted   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
   @@map("customers")
 }
+
+
 
 enum UserRole {
   CUSTOMER
@@ -62,53 +58,61 @@ enum UserStatus {
 }
 
 model Vendor {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  shop      Shop?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name  String
+  email        String @unique
+  profilePhoto  String?
+  contactNumber String?
+  user        User     @relation(fields: [email], references: [email])
+  shop        Shop?
+  isDeleted   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("vendors")
 }
 
 model Admin {
   id        String   @id @default(uuid())
-  userId    String   @unique
-  email     String   @unique
-  user      User     @relation(fields: [userId], references: [id])
+  name  String
+  profilePhoto  String?
+  contactNumber String?
+  email    String @unique
+  user      User     @relation(fields: [email], references: [email])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isDeleted   Boolean @default(false)
 
   @@map("admins")
 }
 
 model Shop {
-  id          String     @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   logo        String
   description String?
-  vendorId    String     @unique
-  vendor      Vendor     @relation(fields: [vendorId], references: [id])
+  vendorId    String   @unique
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
   products    Product[]
-  followers   Customer[] @relation("UserFollowedShops")
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  followers   Customer[]   @relation("UserFollowedShops")
+  isDeleted   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("shops")
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String   @id @default(uuid())
+  name        String   @unique
+  products    Product[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
 }
 
 model Product {
-  id          String       @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
   price       Float
@@ -116,43 +120,35 @@ model Product {
   images      String[] // Array of image URLs
   discount    Float?
   categoryId  String
-  category    Category     @relation(fields: [categoryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
   shopId      String
-  shop        Shop         @relation(fields: [shopId], references: [id])
+  shop        Shop     @relation(fields: [shopId], references: [id])
   reviews     Review[]
-  orders      OrderItem[]
+  orders      Order[]
   cartItem    CartItem[]
   recentView  RecentView[]
-  isDeleted   Boolean      @default(false)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  isDeleted   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("products")
 }
 
 model Order {
-  id          String      @id @default(uuid())
-  userId      String
-  customer    Customer    @relation(fields: [userId], references: [id])
-  totalAmount Float
-  paymentId   String?
-  status      OrderStatus
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String     @id @default(uuid())
+  customerId       String
+  customer         Customer       @relation(fields: [customerId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  paymentId    String?
+  status       OrderStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("orders")
 }
 
-model OrderItem {
-  id        String  @id @default(uuid())
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  quantity  Int
-  price     Float
-}
+
 
 enum OrderStatus {
   PENDING
@@ -169,7 +165,7 @@ model Review {
   productId String
   product   Product  @relation(fields: [productId], references: [id])
   userId    String
-  customer  Customer @relation(fields: [userId], references: [id])
+  customer      Customer     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -177,20 +173,20 @@ model Review {
 }
 
 model Cart {
-  id        String     @id @default(uuid())
-  userId    String     @unique
-  customer  Customer   @relation(fields: [userId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  customer      Customer     @relation(fields: [userId], references: [id])
   items     CartItem[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model CartItem {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
   cartId    String
-  cart      Cart    @relation(fields: [cartId], references: [id])
+  cart      Cart     @relation(fields: [cartId], references: [id])
   quantity  Int
 }
 
@@ -207,7 +203,7 @@ model Coupon {
 model RecentView {
   id        String   @id @default(uuid())
   userId    String
-  customer  Customer @relation(fields: [userId], references: [id])
+  customer      Customer     @relation(fields: [userId], references: [id])
   productId String
   product   Product  @relation(fields: [productId], references: [id])
   viewedAt  DateTime @default(now())

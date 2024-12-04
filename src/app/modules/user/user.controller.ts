@@ -1,11 +1,11 @@
 import { Request, RequestHandler, Response } from "express";
 import httpStatus from "http-status";
-import catchAsync from "../../middlewares/catchAsync";
-import sendResponse from "../shared/sendResponse";
 import { userService } from "./user.service";
 import { userFilterableFields } from "./user.const";
-import pick from "../shared/pick";
 import { IAuthUser } from "../../interfaces/common";
+import catchAsync from "../../../shared/catchAsync";
+import sendResponse from "../../../shared/sendResponnse";
+import pick from "../../../shared/pick";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createAdmin(req);

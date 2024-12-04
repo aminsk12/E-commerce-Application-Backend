@@ -10,6 +10,8 @@ import { IFile } from "../../interfaces/file";
 import { fileUploader } from "../../helpars/fileUploader";
 
 const createAdmin = async (req: any): Promise<Admin> => {
+  console.log("data", req.body);
+
   const file = req.file as IFile;
 
   if (file) {
@@ -36,7 +38,7 @@ const createAdmin = async (req: any): Promise<Admin> => {
 
     return createdAdminData;
   });
-
+  console.log(result);
   return result;
 };
 

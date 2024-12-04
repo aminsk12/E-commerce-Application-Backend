@@ -1,11 +1,12 @@
-import prisma from "../shared/prisma";
-import jwt, { Secret } from "jsonwebtoken";
+
 import * as bcrypt from "bcrypt";
 import config from "../../../config";
-import { jwtHelpers } from "../../helpars/jwtHelpers";
+
 import { UserStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
-import emailSender from "../shared/emailSender";
+import { prisma } from "../../../shared/prisma";
+import { jwtHelpers } from "../../../helpars/jwtHelpers";
+import emailSender from "../../../shared/emailSender";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findFirstOrThrow({

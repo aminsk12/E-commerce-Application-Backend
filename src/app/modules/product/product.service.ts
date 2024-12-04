@@ -1,11 +1,11 @@
 import { Prisma, Product } from "@prisma/client";
-import { fileUploader } from "../../helpars/fileUploader";
-import { paginationHelper } from "../../helpars/paginationHelper";
-import { IFile } from "../../interfaces/file";
-import { IPaginationOptions } from "../../interfaces/pagination";
-import prisma from "../shared/prisma";
 import { productSearchAbleFields } from "./product.const";
 import { IProductFilterRequest } from "./product.interface";
+import { IFile } from "../../interfaces/file";
+import { fileUploader } from "../../../helpars/fileUploader";
+import { prisma } from "../../../shared/prisma";
+import { IPaginationsOptions } from "../../interfaces/paginations";
+import { paginationHelper } from "../../../helpars/paginationHelper";
 
 const createProductIntoDB = async (req: any) => {
   const file = req.file as IFile[];
@@ -24,7 +24,7 @@ const createProductIntoDB = async (req: any) => {
 
 const getProductIntoDB = async (
   params: IProductFilterRequest,
-  options: IPaginationOptions
+  options: IPaginationsOptions
 ) => {
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(options);

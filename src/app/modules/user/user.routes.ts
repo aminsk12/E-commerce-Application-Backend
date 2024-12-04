@@ -3,8 +3,8 @@ import { UserRole } from "@prisma/client";
 import { userValidation } from "./user.validation";
 import { userController } from "./user.controller";
 import auth from "../../middlewares/auth";
-import { fileUploader } from "../../helpars/fileUploader";
 import validateRequest from "../../middlewares/validateRequest";
+import { fileUploader } from "../../../helpars/fileUploader";
 
 const router = express.Router();
 

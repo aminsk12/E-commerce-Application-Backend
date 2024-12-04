@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import catchAsync from "../../middlewares/catchAsync";
-import sendResponse from "../shared/sendResponse";
-import { ProductService } from "./product.service";
-import pick from "../shared/pick";
 import { productFilterableFields } from "./product.const";
+import catchAsync from "../../../shared/catchAsync";
+import { ProductService } from "./product.service";
+import sendResponse from "../../../shared/sendResponnse";
+import pick from "../../../shared/pick";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductService.createProductIntoDB(req.body);
