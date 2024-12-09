@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
-import catchAsync from "../../../shared/catchAsync";
+import catchAsync from "../../middlewares/catchAsync";
 import { AuthService } from "./auth.service";
 import sendResponse from "../../../shared/sendResponnse";
 

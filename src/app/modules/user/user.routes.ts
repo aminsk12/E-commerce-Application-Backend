@@ -16,13 +16,13 @@ router.get(
 
 router.get(
   "/me",
-  auth(UserRole.ADMIN, UserRole.VENDOR),
+  auth(UserRole.ADMIN, UserRole.VENDOR, UserRole.CUSTOMER),
   userController.getMyProfile
 );
 
 router.post(
   "/create-admin",
-  auth(UserRole.ADMIN),
+  // auth(UserRole.ADMIN),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data));
@@ -34,7 +34,7 @@ router.post(
   auth(UserRole.ADMIN),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
-    req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data));
+    req.body = userValidation.createCustomer.parse(JSON.parse(req.body.data));
     return userController.createCustomer(req, res, next);
   }
 );

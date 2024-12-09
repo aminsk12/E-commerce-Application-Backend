@@ -2,8 +2,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { ICloudinaryResponse, IFile } from "../app/interfaces/file";
 import config from "../config";
+import { ICloudinaryResponse, IFile } from "../app/interfaces/file";
+
 
 cloudinary.config({
   cloud_name: config.cloudinary_cloud_name,
@@ -45,10 +46,10 @@ const multepaleImageuploadToCloudinary = async (
 ): Promise<string[]> => {
   const uploadPromises = ImagesFiles.map(async (imageFile) => {
     const { secure_url }: any = await uploadToCloudinary(imageFile);
+
     return secure_url;
   });
   const secureUrls = await Promise.all(uploadPromises);
-
   return secureUrls;
 };
 

@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import { productFilterableFields } from "./product.const";
-import catchAsync from "../../../shared/catchAsync";
+import catchAsync from "../../middlewares/catchAsync";
 import { ProductService } from "./product.service";
+import { productFilterableFields } from "./product.const";
+import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponnse";
 import pick from "../../../shared/pick";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProductService.createProductIntoDB(req.body);
+  const result = await ProductService.createProductIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -15,6 +16,7 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getProductIntoDB = catchAsync(async (req: Request, res: Response) => {
+  console.log("productAll", req.query);
   const filters = pick(req.query, productFilterableFields);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
   const result = await ProductService.getProductIntoDB(filters, options);

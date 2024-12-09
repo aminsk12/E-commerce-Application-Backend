@@ -11,6 +11,7 @@ model User{
   id          String   @id @default(uuid())
   email       String @unique
   password    String
+  profilePhoto String?
   vendor      Vendor?
   admin       Admin?
   customer    Customer?
@@ -27,14 +28,13 @@ model Customer {
   id          String   @id @default(uuid())
   name        String
   email       String   @unique
-  password    String
   profilePhoto  String?
   contactNumber String?
   orders      Order[]
   reviews     Review[]
   cart        Cart[]
   user        User     @relation(fields: [email], references: [email])
-  followedShops Shop[] @relation("UserFollowedShops")
+  followedShops Shop[] @relation("ShopFollowers")
   recentView  RecentView[]
   isDeleted   Boolean @default(false)
   createdAt   DateTime @default(now())
@@ -57,20 +57,6 @@ enum UserStatus {
   DELETED
 }
 
-model Vendor {
-  id          String   @id @default(uuid())
-  name  String
-  email        String @unique
-  profilePhoto  String?
-  contactNumber String?
-  user        User     @relation(fields: [email], references: [email])
-  shop        Shop?
-  isDeleted   Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("vendors")
-}
 
 model Admin {
   id        String   @id @default(uuid())
@@ -86,6 +72,22 @@ model Admin {
   @@map("admins")
 }
 
+model Vendor {
+  id          String   @id @default(uuid())
+  name  String
+  email        String @unique
+  profilePhoto  String?
+  contactNumber String?
+  user        User     @relation(fields: [email], references: [email])
+  shop        Shop?
+  isDeleted   Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("vendors")
+}
+
+
 model Shop {
   id          String   @id @default(uuid())
   name        String
@@ -94,7 +96,8 @@ model Shop {
   vendorId    String   @unique
   vendor      Vendor   @relation(fields: [vendorId], references: [id])
   products    Product[]
-  followers   Customer[]   @relation("UserFollowedShops")
+  followers   Customer[]   @relation("ShopFollowers")
+  order       Order[]
   isDeleted   Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -102,9 +105,12 @@ model Shop {
   @@map("shops")
 }
 
+
 model Category {
   id          String   @id @default(uuid())
   name        String   @unique
+  image       String?
+  offer       String?
   products    Product[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -115,10 +121,12 @@ model Product {
   id          String   @id @default(uuid())
   name        String
   description String?
-  price       Float
-  inventory   Int
+  price       String
   images      String[] // Array of image URLs
-  discount    Float?
+  discount    String?
+  offer       String
+  offerDiscount String?
+  Quantity     String
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
   shopId      String
@@ -134,8 +142,25 @@ model Product {
   @@map("products")
 }
 
+
+model Review {
+  id        String   @id @default(uuid())
+  content   String
+  rating    Int
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  customer      Customer     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
+
 model Order {
   id           String     @id @default(uuid())
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id])
   customerId       String
   customer         Customer       @relation(fields: [customerId], references: [id])
   productId String
@@ -158,27 +183,16 @@ enum OrderStatus {
   CANCELLED
 }
 
-model Review {
-  id        String   @id @default(uuid())
-  content   String
-  rating    Int
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  userId    String
-  customer      Customer     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("reviews")
-}
 
 model Cart {
   id        String   @id @default(uuid())
-  userId    String   @unique
-  customer      Customer     @relation(fields: [userId], references: [id])
+  email    String   @unique
+  customer      Customer     @relation(fields: [email], references: [email])
   items     CartItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  @@map("carts")
 }
 
 model CartItem {
@@ -188,6 +202,8 @@ model CartItem {
   cartId    String
   cart      Cart     @relation(fields: [cartId], references: [id])
   quantity  Int
+
+  @@map("cartItems")
 }
 
 model Coupon {
@@ -207,4 +223,6 @@ model RecentView {
   productId String
   product   Product  @relation(fields: [productId], references: [id])
   viewedAt  DateTime @default(now())
+
+  
 }

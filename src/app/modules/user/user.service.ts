@@ -1,29 +1,31 @@
 import { Admin, Prisma, UserRole, UserStatus, Vendor } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { Request } from "express";
-import prisma from "../shared/prisma";
-import { IPaginationOptions } from "../../interfaces/pagination";
-import { userSearchAbleFields } from "./user.const";
-import { paginationHelper } from "../../helpars/paginationHelper";
-import { IAuthUser } from "../../interfaces/common";
 import { IFile } from "../../interfaces/file";
-import { fileUploader } from "../../helpars/fileUploader";
+import { fileUploader } from "../../../helpars/fileUploader";
+import { prisma } from "../../../shared/prisma";
+import { IPaginationOptions } from "../../interfaces/paginations";
+import { paginationHelper } from "../../../helpars/paginationHelper";
+import { userSearchAbleFields } from "./user.const";
+import { IAuthUser } from "../../interfaces/common";
+
 
 const createAdmin = async (req: any): Promise<Admin> => {
   console.log("data", req.body);
 
   const file = req.file as IFile;
+  console.log(file);
 
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
     req.body.admin.profilePhoto = uploadToCloudinary?.secure_url;
   }
-
+  console.log(req.body);
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
   const userData = {
     email: req.body.admin.email,
     password: hashedPassword,
+    profilePhoto: req.body.admin.profilePhoto || null,
     role: UserRole.ADMIN,
   };
 
@@ -47,7 +49,7 @@ const createVendor = async (req: any): Promise<Vendor> => {
 
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
+    req.body.vendor.profilePhoto = uploadToCloudinary?.secure_url;
   }
 
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
@@ -55,6 +57,7 @@ const createVendor = async (req: any): Promise<Vendor> => {
   const userData = {
     email: req.body.vendor.email,
     password: hashedPassword,
+    profilePhoto: req.body.vendor.profilePhoto || null,
     role: UserRole.VENDOR,
   };
 
@@ -77,7 +80,7 @@ const createCustomer = async (req: any): Promise<Vendor> => {
 
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
+    req.body.customer.profilePhoto = uploadToCloudinary?.secure_url;
   }
 
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
@@ -85,7 +88,8 @@ const createCustomer = async (req: any): Promise<Vendor> => {
   const userData = {
     email: req.body.customer.email,
     password: hashedPassword,
-    role: UserRole.VENDOR,
+    profilePhoto: req.body.customer.profilePhoto || null,
+    role: UserRole.CUSTOMER,
   };
 
   const result = await prisma.$transaction(async (transactionClient) => {
@@ -93,11 +97,11 @@ const createCustomer = async (req: any): Promise<Vendor> => {
       data: userData,
     });
 
-    const createdDoctorData = await transactionClient.customer.create({
+    const createdCustomerData = await transactionClient.customer.create({
       data: req.body.customer,
     });
 
-    return createdDoctorData;
+    return createdCustomerData;
   });
 
   return result;
@@ -179,7 +183,7 @@ const changeProfileStatus = async (id: string, status: UserRole) => {
       id,
     },
   });
-
+  console.log("getmy", userData);
   const updateUserStatus = await prisma.user.update({
     where: {
       id,
@@ -193,8 +197,7 @@ const changeProfileStatus = async (id: string, status: UserRole) => {
 const getMyProfile = async (user: IAuthUser) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      id: user?.id,
-      status: UserStatus.ACTIVE,
+      id: user?.userId,
     },
     select: {
       id: true,
@@ -233,8 +236,7 @@ const getMyProfile = async (user: IAuthUser) => {
 const updateMyProfie = async (user: IAuthUser, req: any) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      id: user?.id,
-      status: UserStatus.ACTIVE,
+      id: user?.userId,
     },
   });
 

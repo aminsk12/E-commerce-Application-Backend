@@ -1,9 +1,9 @@
 import { Request, RequestHandler, Response } from "express";
 import httpStatus from "http-status";
+import catchAsync from "../../middlewares/catchAsync";
 import { userService } from "./user.service";
 import { userFilterableFields } from "./user.const";
 import { IAuthUser } from "../../interfaces/common";
-import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponnse";
 import pick from "../../../shared/pick";
 
@@ -67,7 +67,7 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
 const getMyProfile = catchAsync(
   async (req: Request & { user?: IAuthUser }, res: Response) => {
     const user = req.user;
-
+    console.log("user", user);
     const result = await userService.getMyProfile(user as IAuthUser);
 
     sendResponse(res, {
