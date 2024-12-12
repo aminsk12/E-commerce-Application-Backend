@@ -124,7 +124,7 @@ model Product {
   price       String
   images      String[] // Array of image URLs
   discount    String?
-  offer       String
+  offer       String 
   offerDiscount String?
   Quantity     String
   categoryId  String
@@ -166,12 +166,16 @@ model Order {
   productId String
   product   Product  @relation(fields: [productId], references: [id])
   paymentId    String?
+  cartId  String?
+  quantity String
   status       OrderStatus @default(PENDING)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@map("orders")
 }
+
+
 
 
 
@@ -205,6 +209,23 @@ model CartItem {
 
   @@map("cartItems")
 }
+
+model Payment {
+  id                 String   @id @default(uuid()) 
+  customerId             String 
+  email              String   
+  amount             Float    
+  payment_processor   String   
+  bank_trxid          String?  
+  pg_txnid            String?  
+  mer_txnid           String?  
+  payment_type        String?   
+  createdAt          DateTime @default(now()) 
+  updatedAt          DateTime @updatedAt     
+
+  @@map("payments") 
+}
+
 
 model Coupon {
   id        String   @id @default(uuid())
