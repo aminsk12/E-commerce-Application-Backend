@@ -12,6 +12,15 @@ router.get(
   CartController.getCartByCustomer
 );
 router.get("/", auth(UserRole.VENDOR), CartController.getOrderByVendor);
-router.post("/", auth(UserRole.CUSTOMER), CartController.deleteCartByCustomer);
+router.delete(
+  "/:id",
+  auth(UserRole.CUSTOMER),
+  CartController.deleteCartItemById
+);
+router.get(
+  "/price/:id",
+  auth(UserRole.CUSTOMER),
+  CartController.totalPriceByCartId
+);
 
 export const CartRoutes = router;

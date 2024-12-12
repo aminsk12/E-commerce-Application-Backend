@@ -35,12 +35,22 @@ const getOrderByVendor = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-const deleteCartByCustomer = catchAsync(async (req: Request, res: Response) => {
-  const result = await CartService.deleteCartByCustomerFromDB(req.body.id);
+const deleteCartItemById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await CartService.deleteCartItemByCustomerFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Delete successfully!",
+    data: result,
+  });
+});
+const totalPriceByCartId = catchAsync(async (req: Request, res: Response) => {
+  const result = await CartService.totalPriceFormCart(req);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "total price get successfully!",
     data: result,
   });
 });
@@ -49,5 +59,6 @@ export const CartController = {
   createOrder,
   getOrderByVendor,
   getCartByCustomer,
-  deleteCartByCustomer,
+  deleteCartItemById,
+  totalPriceByCartId,
 };
